@@ -33,9 +33,9 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Go Get dependencies and go module
-        run: |
-          go mod tidy
-          go get -v -t -d ./...
+      run: |
+        go mod tidy
+        go get -v -t -d ./...
 
     - name: Build
       # 这里build 时交叉编译并设置使用所有内置库静态编译程序
