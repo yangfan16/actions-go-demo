@@ -32,22 +32,29 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
+    - name: Go Get dependencies and go module
+        run: |
+          go mod tidy
+          go get -v -t -d ./...
+
     - name: Build
-      run: go build -v .
+      # 这里build 时交叉编译并设置使用所有内置库静态编译程序
+      # 方便最后一步做出的Docker镜像小一些
+      run: CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o main .
 
     - name: Staticcheck
       run: |
         # https://github.com/actions/setup-go/issues/14
         # 已经修复这个问题，直接go get 就行
         # export PATH=${PATH}:`go env GOPATH`/bin
-        go get -u honnef.co/go/tools/cmd/staticcheck
+        # go get -u honnef.co/go/tools/cmd/staticcheck
         staticcheck ./...
 
     - name: Test
       run: |
-        go get -u github.com/smartystreets/goconvey
-        go mod tidy
-        go test -v ./hello
+        # go get -u github.com/smartystreets/goconvey
+        # go mod tidy
+        go test -v ./...
 
     - name: Netlify deploy
       env:
